@@ -12,6 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
@@ -39,9 +40,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import utils.ConfigManager;
 import utils.Utils;
+
+import com.apple.eawt.Application;
 
 public class AndroidResources {
 	private Utils utils = new Utils();
@@ -96,6 +100,7 @@ public class AndroidResources {
 
 					ConfigManager.instance.set(ConfigManager.PATH,
 							file.getAbsolutePath());
+					lblPath.setText(file.getAbsolutePath());
 					break;
 				}
 				// btnArrange.setFont(btnArrange.getFont().deriveFont(Font.BOLD));
@@ -106,6 +111,7 @@ public class AndroidResources {
 			}
 		}
 	};
+	private JLabel lblPath;
 
 	/**
 	 * Launch the application.
@@ -128,6 +134,10 @@ public class AndroidResources {
 	 */
 	public AndroidResources() {
 		try {
+			Application a = Application.getApplication();
+			Image image = Toolkit.getDefaultToolkit().getImage(
+					getClass().getResource("drop_area_on.png"));
+			a.setDockIconImage(image);
 			initialize();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -153,6 +163,7 @@ public class AndroidResources {
 				886, 631);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		panel.setToolTipText("Drag or click to choose a folder");
 		panel.addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -160,6 +171,7 @@ public class AndroidResources {
 				String path = utils.chooseDialog(false, frame,
 						utils.getDesktopPath(), "");
 				if (path != null && !path.equals("")) {
+					lblPath.setText(path);
 					ConfigManager.instance.set(ConfigManager.PATH, path);
 				}
 
@@ -167,7 +179,7 @@ public class AndroidResources {
 		});
 
 		panel.setDropTarget(dropTarget);
-		panel.setBounds(264, 101, 318, 294);
+		panel.setBounds(263, 61, 318, 294);
 
 		frame.getContentPane().add(panel);
 
@@ -178,6 +190,7 @@ public class AndroidResources {
 		ImageIcon imgConClose = new ImageIcon(imgClose);
 
 		ImageButton btnClose = new ImageButton(imgConClose);
+		btnClose.setToolTipText("Close");
 		btnClose.setBounds(29, 24, 60, 60);
 		btnClose.setBorderPainted(false);
 		try {
@@ -232,6 +245,13 @@ public class AndroidResources {
 		lblV.setFont(new Font("Helvetica Neue", Font.PLAIN, 12));
 		lblV.setBounds(744, 32, 39, 25);
 		frame.getContentPane().add(lblV);
+
+		lblPath = new JLabel("");
+		lblPath.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPath.setForeground(new Color(128, 128, 128));
+		lblPath.setFont(new Font("Helvetica", Font.PLAIN, 18));
+		lblPath.setBounds(184, 367, 476, 27);
+		frame.getContentPane().add(lblPath);
 		allowMove();
 	}
 
@@ -377,7 +397,7 @@ public class AndroidResources {
 					System.out.println("File " + fileName);
 					int start = fileName.lastIndexOf("_") + 1;
 					int end = fileName.indexOf("." + picType);
-					String quality = fileName.substring(start, end);
+					String quality = fileName.substring(start, end).replaceAll("\\d*$", "").replace(".", "");
 					if (quality.equals("") || quality.contains(" ")) {
 						continue;
 					}
@@ -434,6 +454,7 @@ public class AndroidResources {
 					System.out.println("Directory " + listOfFiles[i].getName());
 				}
 			}
+			lblPath.setText("");
 //			btnArrange.setFont(btnArrange.getFont().deriveFont(Font.PLAIN));
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
