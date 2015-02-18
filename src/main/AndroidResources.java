@@ -48,14 +48,14 @@ import utils.Utils;
 import com.apple.eawt.Application;
 
 public class AndroidResources {
+	private static final int BIG_FONT_SIZE = 24;
 	private Utils utils = new Utils();
 	private JFrame frame;
 	private JPanel pnlStatus = new JPanel();
 	private JLabel lblStatusCounter = new JLabel();
 	private ImageButton btnArrange;
 	private Point mouseDownCompCoords;
-	private ImagePanel panel = new ImagePanel(new ImageIcon(getClass()
-			.getResource("drop_area_off.png").getFile()).getImage());
+	private ImagePanel panel;
 	private boolean isDragOn = true;
 	private DropTarget dropTarget = new DropTarget() {
 		/**
@@ -163,6 +163,9 @@ public class AndroidResources {
 				886, 631);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		panel = new ImagePanel(getClass().getResource("drop_area_off.png")
+				.getFile());
+		toggleDragArea(!isDragOn);
 		panel.setToolTipText("Drag or click to choose a folder");
 		panel.addMouseListener(new MouseAdapter() {
 
@@ -209,7 +212,8 @@ public class AndroidResources {
 
 		JLabel lblStatus = new JLabel("Android Resources");
 		lblStatus.setForeground(new Color(128, 128, 128));
-		lblStatus.setFont(new Font("Helvetica Neue", Font.PLAIN, 24));
+		lblStatus
+				.setFont(new Font("Helvetica Neue", Font.PLAIN, BIG_FONT_SIZE));
 		lblStatus.setBounds(535, 24, 238, 25);
 		frame.getContentPane().add(lblStatus);
 
@@ -249,9 +253,11 @@ public class AndroidResources {
 		lblPath = new JLabel("");
 		lblPath.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPath.setForeground(new Color(128, 128, 128));
-		lblPath.setFont(new Font("Helvetica", Font.PLAIN, 18));
+		lblPath.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
 		lblPath.setBounds(184, 367, 476, 27);
 		frame.getContentPane().add(lblPath);
+
+
 		allowMove();
 	}
 
@@ -348,41 +354,44 @@ public class AndroidResources {
 	}
 
 	private String version() {
-		return "0.9.5";
+		return "0.9.6";
 	}
 
 	protected void movieFiles(String path, String dest, String picType) {
 		try {
 			int xStart = 120;
 			int y = 52;
-			int width = 82;
-			int height = 30;
-			int widthlbl = 20;
+			int width = 70;
+			int height = 40;
+			int widthlbl = 15;
 			File folder = new File(path);
 			File[] listOfFiles = folder.listFiles();
-			BufferedImage img1;
-			img1 = ImageIO.read(getClass().getResource("files.png"));
+			BufferedImage imgFiles = ImageIO.read(getClass().getResource(
+					"files.png"));
+			Image dimg = imgFiles.getScaledInstance(width, height,
+					Image.SCALE_SMOOTH);
+			ImageIcon imageIcon = new ImageIcon(dimg);
 
 			pnlStatus.removeAll();
 			pnlStatus.repaint();
 			lblStatusCounter.setForeground(new Color(128, 128, 128));
 			lblStatusCounter
-					.setFont(new Font("Helvetica Neue", Font.PLAIN, 24));
+.setFont(new Font("Helvetica Neue", Font.PLAIN,
+					BIG_FONT_SIZE));
 			lblStatusCounter.setBounds(601, 40, 203, 53);
 
 			JLabel lblStatus = new JLabel("Status");
 			lblStatus.setForeground(Color.GRAY);
-			lblStatus.setFont(new Font("Helvetica Neue", Font.PLAIN, 24));
+			lblStatus.setFont(new Font("Helvetica Neue", Font.PLAIN,
+					BIG_FONT_SIZE));
 			lblStatus.setBounds(33, 40, 82, 53);
 			pnlStatus.add(lblStatus);
 
-			Image dimg = img1.getScaledInstance(82, 27, Image.SCALE_SMOOTH);
-			ImageIcon imageIcon = new ImageIcon(dimg);
-
-			BufferedImage img2 = ImageIO.read(getClass().getResource(
+			BufferedImage bfImgCheck = ImageIO.read(getClass().getResource(
 					"check.png"));
-			Image dimg2 = img2.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-			ImageIcon imgCon = new ImageIcon(dimg2);
+			Image imgCheck = bfImgCheck.getScaledInstance(widthlbl, widthlbl,
+					Image.SCALE_SMOOTH);
+			ImageIcon imgCon = new ImageIcon(imgCheck);
 
 			Map<String, Boolean> doneQualities = new HashMap<String, Boolean>();
 			int count = 0;
@@ -397,28 +406,30 @@ public class AndroidResources {
 					System.out.println("File " + fileName);
 					int start = fileName.lastIndexOf("_") + 1;
 					int end = fileName.indexOf("." + picType);
-					String quality = fileName.substring(start, end).replaceAll("\\d*$", "").replace(".", "");
+					String quality = fileName.substring(start, end)
+							.replaceAll("\\d*$", "").replace(".", "");
 					if (quality.equals("") || quality.contains(" ")) {
 						continue;
 					}
 
-					boolean addLabal = false;
+					boolean isAddLabel = false;
 					try {
-						addLabal = !doneQualities.get(quality);
+						isAddLabel = !doneQualities.get(quality);
 					} catch (Exception e) {
-						addLabal = true;
+						isAddLabel = true;
 					}
-					if (addLabal) {
+					if (isAddLabel) {
+
 						ImageLabel lblQuality = new ImageLabel(imageIcon);
 						lblQuality.setText(quality.toUpperCase());
 						lblQuality.setBounds(xStart + count
 								* (width + widthlbl) + 15, y, width, height);
 						pnlStatus.add(lblQuality);
 
-						JLabel lblNewLabel_2 = new ImageLabel(imgCon);
-						lblNewLabel_2.setBounds(xStart + (count + 1) * width
+						JLabel lblCheck = new ImageLabel(imgCon);
+						lblCheck.setBounds(xStart + (count + 1) * width
 								+ count * widthlbl + 15, y, widthlbl, widthlbl);
-						pnlStatus.add(lblNewLabel_2);
+						pnlStatus.add(lblCheck);
 						System.out.println("added " + quality);
 						pnlStatus.repaint();
 						doneQualities.put(quality, true);
@@ -455,7 +466,7 @@ public class AndroidResources {
 				}
 			}
 			lblPath.setText("");
-//			btnArrange.setFont(btnArrange.getFont().deriveFont(Font.PLAIN));
+			// btnArrange.setFont(btnArrange.getFont().deriveFont(Font.PLAIN));
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

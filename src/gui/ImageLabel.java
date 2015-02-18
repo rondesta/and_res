@@ -15,7 +15,7 @@ public class ImageLabel extends JLabel {
 	public ImageLabel(ImageIcon imageIcon) {
 		this.setIcon(imageIcon);
 		this.setForeground(new Color(255, 255, 255));
-		this.setFont(new Font("Helvetica Neue", Font.PLAIN, 24));
+		this.setFont(new Font("Helvetica Neue", Font.BOLD, 16));
 		this.setHorizontalTextPosition(JLabel.CENTER);
 		this.setVerticalTextPosition(JLabel.CENTER);
 		this.setIcon(imageIcon);
