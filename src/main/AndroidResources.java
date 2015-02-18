@@ -43,15 +43,15 @@ import javax.swing.JPanel;
 import utils.ConfigManager;
 import utils.Utils;
 
-
 public class AndroidResources {
 	private Utils utils = new Utils();
 	private JFrame frame;
 	private JPanel pnlStatus = new JPanel();
 	private JLabel lblStatusCounter = new JLabel();
+	private ImageButton btnArrange;
 	private Point mouseDownCompCoords;
 	private ImagePanel panel = new ImagePanel(new ImageIcon(getClass()
-			.getResource("drop_area_on.png").getFile()).getImage());
+			.getResource("drop_area_off.png").getFile()).getImage());
 	private boolean isDragOn = true;
 	private DropTarget dropTarget = new DropTarget() {
 		/**
@@ -61,6 +61,7 @@ public class AndroidResources {
 
 		@Override
 		public synchronized void dragEnter(DropTargetDragEvent dtde) {
+			toggleDragArea(isDragOn);
 			// Change cursor...
 			Cursor cursor = new Cursor(Cursor.HAND_CURSOR);
 			frame.setCursor(cursor);
@@ -75,6 +76,7 @@ public class AndroidResources {
 			// Set cursor to default.
 			Cursor cursor = new Cursor(Cursor.DEFAULT_CURSOR);
 			frame.setCursor(cursor);
+			toggleDragArea(!isDragOn);
 
 		}
 
@@ -91,12 +93,14 @@ public class AndroidResources {
 					 * NOTE: When I change this to a println, it prints the
 					 * correct path
 					 */
-					toggleDragArea(!isDragOn);
+
 					ConfigManager.instance.set(ConfigManager.PATH,
 							file.getAbsolutePath());
 					break;
 				}
+				// btnArrange.setFont(btnArrange.getFont().deriveFont(Font.BOLD));
 				evt.dropComplete(true);
+
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -151,20 +155,12 @@ public class AndroidResources {
 		frame.getContentPane().setLayout(null);
 		panel.addMouseListener(new MouseAdapter() {
 
-
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				try {
-					String path = utils.chooseDialog(false, frame,
-							utils.getDesktopPath(), "");
-					if (path != null && !path.equals("")) {
-						toggleDragArea(!isDragOn);
-						ConfigManager.instance.set(ConfigManager.PATH, path);
-
-					}
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				String path = utils.chooseDialog(false, frame,
+						utils.getDesktopPath(), "");
+				if (path != null && !path.equals("")) {
+					ConfigManager.instance.set(ConfigManager.PATH, path);
 				}
 
 			}
@@ -181,22 +177,22 @@ public class AndroidResources {
 				Image.SCALE_SMOOTH);
 		ImageIcon imgConClose = new ImageIcon(imgClose);
 
-		ImageButton button = new ImageButton(imgConClose);
-		button.setBounds(29, 24, 60, 60);
-		button.setBorderPainted(false);
+		ImageButton btnClose = new ImageButton(imgConClose);
+		btnClose.setBounds(29, 24, 60, 60);
+		btnClose.setBorderPainted(false);
 		try {
 			Image img = ImageIO.read(getClass().getResource("Close@2x.png"));
-			button.setIcon(new ImageIcon(img));
+			btnClose.setIcon(new ImageIcon(img));
 		} catch (IOException ex) {
 		}
-		button.addActionListener(new ActionListener() {
+		btnClose.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
 
-		frame.getContentPane().add(button);
+		frame.getContentPane().add(btnClose);
 
 		JLabel lblStatus = new JLabel("Android Resources");
 		lblStatus.setForeground(new Color(128, 128, 128));
@@ -211,10 +207,9 @@ public class AndroidResources {
 
 		BufferedImage img = ImageIO.read(getClass().getResource("button.png"));
 		img = resize(img, 269, 61);
-		// Image dimg3 = img.getScaledInstance(200, 60, Image.SCALE_SMOOTH);
 		ImageIcon imgCon2 = new ImageIcon(img);
 
-		ImageButton btnArrange = new ImageButton(imgCon2);
+		btnArrange = new ImageButton(imgCon2);
 		btnArrange.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -439,7 +434,7 @@ public class AndroidResources {
 					System.out.println("Directory " + listOfFiles[i].getName());
 				}
 			}
-			toggleDragArea(isDragOn);
+//			btnArrange.setFont(btnArrange.getFont().deriveFont(Font.PLAIN));
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -447,14 +442,19 @@ public class AndroidResources {
 
 	}
 
-	private void toggleDragArea(boolean isDragOn) throws IOException {
-		Image img;
-		if (isDragOn) {
-			img = ImageIO.read(getClass().getResource("drop_area_off.png"));
+	private void toggleDragArea(boolean isDragOn) {
+		try {
+			Image img;
+			if (isDragOn) {
+				img = ImageIO.read(getClass().getResource("drop_area_on.png"));
 
-		} else {
-			img = ImageIO.read(getClass().getResource("drop_area_on.png"));
+			} else {
+				img = ImageIO.read(getClass().getResource("drop_area_off.png"));
+			}
+			panel.setPic(img);
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
-		panel.setPic(img);
+
 	}
 }
