@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +14,6 @@ import java.io.InputStreamReader;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -87,53 +85,6 @@ public class Utils {
 		}
 	}
 
-	/**
-	 * Executes a command line
-	 * 
-	 * @param commnd
-	 *            The command
-	 * @return The output of the execution.
-	 */
-	public String execCmd(String[] commnd) {
-		String result = Arrays.toString(commnd).replace(",", "").replace("[", "").replace("]", "");
-		// System.out.println(result);
-		try {
-
-			String sendback = "";
-			Process proc = Runtime.getRuntime().exec(commnd);
-			InputStream istr = proc.getInputStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(istr));
-			String str;
-			while ((str = br.readLine()) != null) {
-				str = str.trim();
-				if (str.length() > 0)
-					sendback = sendback + "\n" + str.trim();
-			}
-			proc.waitFor();
-			result += "\nCommand result: " + sendback;
-			br.close();
-		} catch (IOException er) {
-			// TODO Auto-generated catch block
-			er.printStackTrace();
-		} catch (InterruptedException er) {
-			// TODO Auto-generated catch block
-			er.printStackTrace();
-		} catch (Exception er) {
-			// TODO Auto-generated catch block
-			er.printStackTrace();
-		}
-		return result.replaceAll("(?m)^[ \t]*\r?\n", "");
-	}
-
-	/**
-	 * Removes files and folders recursively.
-	 * 
-	 * @param prefix
-	 *            The path.
-	 */
-	public void removeFiles(String prefix) {
-		execCmd(new String[] { "sh", "-c", "rm -rf " + prefix });
-	}
 
 	/**
 	 * Reads one line from a file.
@@ -194,67 +145,6 @@ public class Utils {
 	}
 
 	/**
-	 * Executes command line.
-	 * 
-	 * @param command
-	 *            The command.
-	 * @param hiddenText
-	 *            - In case of passwords.
-	 * @return The output of the command.
-	 */
-	public String executeCommand(String command, String hiddenText) {
-		if (hiddenText.equals("")) {
-			System.out.println(command);
-		} else {
-			System.out.println(command.replace(hiddenText, "**********"));
-		}
-
-		StringBuffer output = new StringBuffer();
-
-		Process p;
-		try {
-			p = Runtime.getRuntime().exec(command, null, new File("/tmp"));
-			p.waitFor();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-			String line = "";
-			while ((line = reader.readLine()) != null) {
-				line = line.trim();
-				if (line.length() > 0)
-					output.append(line + "\n");
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return output.toString().replaceAll("(?m)^[ \t]*\r?\n", "");
-	}
-
-	/**
-	 * Executes command line.
-	 * 
-	 * @param command
-	 *            The command
-	 * @return The output of the command.
-	 */
-	public String executeCommand(String command) {
-		return executeCommand(command, "");
-	}
-
-	/**
-	 * Executes command line.
-	 * 
-	 * @param cmdArgs
-	 *            The command
-	 * @return The output of the command.
-	 */
-	public String executeCommand(ArrayList<String> cmdArgs) {
-		String[] stockArr = new String[cmdArgs.size()];
-		stockArr = cmdArgs.toArray(stockArr);
-		return execCmd(stockArr);
-	}
-
-	/**
 	 * 
 	 * @return The path to user's desktop.
 	 */
@@ -306,167 +196,6 @@ public class Utils {
 
 		String filename = fd.getDirectory() + fd.getFile();
 		return filename;
-	}
-
-	/**
-	 * Searches for a string and replace it.
-	 * 
-	 * @param path
-	 *            The path of the file.
-	 * @param string
-	 *            The string to look for.
-	 * @param newVal
-	 *            The new value to replace.
-	 */
-	public void findReplace(String path, String string, String newVal) {
-		System.out.println(path);
-		BufferedReader brFile = null;
-		FileOutputStream fosFile = null;
-		try {
-			brFile = new BufferedReader(new FileReader(path));
-
-			// input the file content to the String "input"
-			String line;
-			String input = "";
-			boolean isChanged = false;
-			while ((line = brFile.readLine()) != null) {
-				System.out.println(line);
-				if (line.contains(string)) {
-					line = newVal;
-					System.out.println(line);
-					isChanged = true;
-				}
-				input += line + '\n';
-			}
-
-			// write the new String with the replaced line OVER the same file
-			if (isChanged)
-				fosFile = new FileOutputStream(path);
-			fosFile.write(input.getBytes());
-
-		} catch (FileNotFoundException e) {
-			System.out.println("Problem reading file.");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				brFile.close();
-				fosFile.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-
-	}
-
-	/**
-	 * Same as @see {@link #findReplace(String, String, String)} but the file is
-	 * Waze's preferences file. For example: GPS.Show: yes --> GPS.Show: no
-	 * 
-	 * @param filePath
-	 *            The path of the file.
-	 * @param preference
-	 *            The key to the preference.
-	 * @param optionA
-	 *            The first option.
-	 * @param optionB
-	 *            The second option
-	 */
-	public void togglePreference(String filePath, String preference, String optionA, String optionB) {
-		System.out.println(preference);
-		BufferedReader brFile = null;
-		FileOutputStream fosFile = null;
-		try {
-			brFile = new BufferedReader(new FileReader(filePath));
-
-			String line;
-			String input = "";
-			boolean isChanged = false;
-			while ((line = brFile.readLine()) != null) {
-				if (line.contains(preference)) {
-					if (line.contains(optionA)) {
-						line = line.replace(optionA, optionB);
-						isChanged = true;
-					} else if (line.contains(optionB)) {
-						line = line.replace(optionB, optionA);
-						isChanged = true;
-					}
-				}
-				input += line + '\n';
-			}
-
-			// write the new String with the replaced line OVER the same file
-			if (isChanged)
-				fosFile = new FileOutputStream(filePath);
-			fosFile.write(input.getBytes());
-
-		} catch (FileNotFoundException e) {
-			System.out.println("Problem reading file.");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				brFile.close();
-				fosFile.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-
-	}
-
-	/**
-	 * Set a specific value to a prefrence line.
-	 * 
-	 * @param filePath
-	 *            The path of the file.
-	 * @param preference
-	 *            The key to the preference.
-	 * @param option
-	 *            The new value to set.
-	 */
-	public void togglePreference(String filePath, String preference, String option) {
-		System.out.println(preference);
-		BufferedReader brFile = null;
-		FileOutputStream fosFile = null;
-		try {
-			brFile = new BufferedReader(new FileReader(filePath));
-
-			String line;
-			String input = "";
-			String currenValue = "";
-			while ((line = brFile.readLine()) != null) {
-				if (line.contains(preference)) {
-					currenValue = line.split(preference)[1];
-					line = line.replace(currenValue, option);
-				}
-				input += line + '\n';
-			}
-			// write the new String with the replaced line OVER the same file
-			fosFile = new FileOutputStream(filePath);
-			fosFile.write(input.getBytes());
-
-		} catch (FileNotFoundException e) {
-			System.out.println("Problem reading file.");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				brFile.close();
-				fosFile.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
 	}
 
 	public void writeFile(String filePath, String linesToWrite) {
@@ -522,18 +251,5 @@ public class Utils {
 		}
 		LOGGER.info(output.toString());
 		return path + output.toString();
-	}
-
-	/**
-	 * Create symbolic link
-	 * 
-	 * @param path
-	 *            The original file.
-	 * @param symlinkPath
-	 *            The path to shortcut.
-	 */
-	public void createSymlink(String path, String symlinkPath) {
-		String[] command = { "ln", "-s", path, symlinkPath };
-		execCmd(command);
 	}
 }

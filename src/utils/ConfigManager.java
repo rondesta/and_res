@@ -29,10 +29,10 @@ public class ConfigManager {
 
 	private ConfigManager() {
 		String parenFolder = mUtils.getHomeDir()
-				+ "/Library/Application Support/DrPic/";
+				+ "/Library/Application Support/Android/Resources";
 		new File(parenFolder).mkdirs();
 
-		this.configPath = parenFolder + "drpic.cfg";
+		this.configPath = parenFolder + "and_res.cfg";
 		this.configs = new HashMap<String, String>();
 
 		this.defualtConfigs = new HashMap<String, String>();
