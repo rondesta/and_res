@@ -1,7 +1,7 @@
 # AndroidResources
 ## Arrange Android resources
 
-To use AndroidResources.jar you need Java and JDK 6 and later.
+To use [AndroidResources.jar](https://github.com/rondesta/and_res/blob/master/AndroidResources.jar) you need Java and JDK 6 and later.
 * Option A: Double click.* 
 * Option B: From command line: ```java -jar <path to>/AndroidResources.jar```
 * Drag and drop a floder with PNGs, if it contains filename formatted **"\*\_\<quality\>.png"**, 
