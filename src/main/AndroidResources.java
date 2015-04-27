@@ -6,6 +6,7 @@ import gui.ImagePanel;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -21,8 +22,6 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -42,7 +41,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import utils.ConfigManager;
 import utils.Utils;
 
 import com.apple.eawt.Application;
@@ -98,8 +96,6 @@ public class AndroidResources {
 					 * correct path
 					 */
 
-					ConfigManager.instance.set(ConfigManager.PATH,
-							file.getAbsolutePath());
 					lblPath.setText(file.getAbsolutePath());
 					break;
 				}
@@ -157,10 +153,11 @@ public class AndroidResources {
 		frame.setVisible(true);
 		frame.setShape(new RoundRectangle2D.Double(10, 10, 800, 600, 50, 50));
 		frame.setSize(886, 631);
-		frame.setBounds(
-				Integer.parseInt(ConfigManager.instance.get(ConfigManager.X)),
-				Integer.parseInt(ConfigManager.instance.get(ConfigManager.Y)),
-				886, 631);
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		int x = (int) ((dimension.getWidth() - frame.getWidth()) / 2);
+		int y = (int) ((dimension.getHeight() - frame.getHeight()) / 2);
+		frame.setLocation(x, y);
+		frame.setBounds(x, y, 886, 631);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		panel = new ImagePanel(getClass().getResource("drop_area_off.png")
@@ -175,7 +172,6 @@ public class AndroidResources {
 						utils.getDesktopPath(), "");
 				if (path != null && !path.equals("")) {
 					lblPath.setText(path);
-					ConfigManager.instance.set(ConfigManager.PATH, path);
 				}
 
 			}
@@ -230,8 +226,7 @@ public class AndroidResources {
 		btnArrange.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				movieFiles(ConfigManager.instance.get(ConfigManager.PATH),
-						ConfigManager.instance.get(ConfigManager.PATH), "png");
+				movieFiles(lblPath.getText(), lblPath.getText(), "png");
 			}
 		});
 		btnArrange.setBorderPainted(false);
@@ -257,7 +252,6 @@ public class AndroidResources {
 		lblPath.setBounds(184, 367, 476, 27);
 		frame.getContentPane().add(lblPath);
 
-
 		allowMove();
 	}
 
@@ -274,28 +268,6 @@ public class AndroidResources {
 	}
 
 	private void allowMove() {
-		frame.addComponentListener(new ComponentListener() {
-
-			@Override
-			public void componentResized(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentMoved(ComponentEvent e) {
-				ConfigManager.instance.set(ConfigManager.X, frame.getX() + "");
-				ConfigManager.instance.set(ConfigManager.Y, frame.getY() + "");
-			}
-
-			@Override
-			public void componentShown(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentHidden(ComponentEvent e) {
-			}
-
-		});
-
 		frame.addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {
 				mouseDownCompCoords = null;
@@ -330,31 +302,11 @@ public class AndroidResources {
 
 			}
 		});
-		frame.addComponentListener(new ComponentListener() {
-
-			@Override
-			public void componentResized(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentMoved(ComponentEvent e) {
-				ConfigManager.instance.set(ConfigManager.X, frame.getX() + "");
-				ConfigManager.instance.set(ConfigManager.Y, frame.getY() + "");
-			}
-
-			@Override
-			public void componentShown(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentHidden(ComponentEvent e) {
-			}
-
-		});
+		
 	}
 
 	private String version() {
-		return "0.9.6";
+		return "1.0.0";
 	}
 
 	protected void movieFiles(String path, String dest, String picType) {
@@ -375,8 +327,7 @@ public class AndroidResources {
 			pnlStatus.removeAll();
 			pnlStatus.repaint();
 			lblStatusCounter.setForeground(new Color(128, 128, 128));
-			lblStatusCounter
-.setFont(new Font("Helvetica Neue", Font.PLAIN,
+			lblStatusCounter.setFont(new Font("Helvetica Neue", Font.PLAIN,
 					BIG_FONT_SIZE));
 			lblStatusCounter.setBounds(601, 40, 203, 53);
 
@@ -427,8 +378,8 @@ public class AndroidResources {
 						pnlStatus.add(lblQuality);
 
 						JLabel lblCheck = new ImageLabel(imgCon);
-						lblCheck.setBounds(xStart + (count + 1) * width
-								+ count * widthlbl + 15, y, widthlbl, widthlbl);
+						lblCheck.setBounds(xStart + (count + 1) * width + count
+								* widthlbl + 15, y, widthlbl, widthlbl);
 						pnlStatus.add(lblCheck);
 						System.out.println("added " + quality);
 						pnlStatus.repaint();
